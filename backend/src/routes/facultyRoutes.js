@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { getFaculty, getAllFaculty, createFaculty, updateFaculty, deleteFaculty } from '../controllers/facultyController.js';
+import { protect } from '../middleware/auth.js';
+const router = Router();
+router.get('/',       getFaculty);
+router.get('/all',    protect, getAllFaculty);
+router.post('/',      protect, createFaculty);
+router.put('/:id',    protect, updateFaculty);
+router.delete('/:id', protect, deleteFaculty);
+export default router;

@@ -1,0 +1,11 @@
+import { Router } from 'express';
+import { getCourses, getAllCourses, getCourseById, createCourse, updateCourse, deleteCourse } from '../controllers/courseController.js';
+import { protect } from '../middleware/auth.js';
+const router = Router();
+router.get('/',       getCourses);
+router.get('/all',    protect, getAllCourses);
+router.get('/:id',    getCourseById);
+router.post('/',      protect, createCourse);
+router.put('/:id',    protect, updateCourse);
+router.delete('/:id', protect, deleteCourse);
+export default router;

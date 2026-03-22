@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { requestRegistration, verifyOTP, resendOTP, getRegistrations, updateRegistrationStatus } from '../controllers/registrationController.js';
+import { protect } from '../middleware/auth.js';
+const router = Router();
+router.post('/request',    requestRegistration);
+router.post('/verify-otp', verifyOTP);
+router.post('/resend-otp', resendOTP);
+router.get('/',            protect, getRegistrations);
+router.patch('/:id/status', protect, updateRegistrationStatus);
+export default router;

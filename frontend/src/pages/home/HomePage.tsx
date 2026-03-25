@@ -301,7 +301,7 @@ const HomePage = () => {
                   <div className="w-10 h-10 bg-blue-50 border border-blue-200 rounded-xl flex items-center justify-center shrink-0 text-lg">📧</div>
                   <div>
                     <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-1">Email</div>
-                    <div className="text-slate-700 text-sm">skillspheresoftsolutionspvtltd@gmail.com</div>
+                    <div className="text-slate-700 text-sm">SkillSphere@gmail.com</div>
                   </div>
                 </div>
                 <div className="flex gap-4">

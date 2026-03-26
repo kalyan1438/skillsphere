@@ -10,27 +10,26 @@ export const requestRegistration = async (req, res, next) => {
     if (!name || !email || !phone || !courseId)
       return res.status(400).json({ success: false, message: 'name, email, phone, courseId are required' });
 
-    const emailReg = /^\S+@\S+\.\S+$/;
-    if (!emailReg.test(email))
+    if (!/^\S+@\S+\.\S+$/.test(email))
       return res.status(400).json({ success: false, message: 'Invalid email address' });
 
-    const phoneReg = /^[\d\s\+\-]{10,15}$/;
-    if (!phoneReg.test(phone))
+    if (!/^[\d\s\+\-]{10,15}$/.test(phone))
       return res.status(400).json({ success: false, message: 'Invalid phone number' });
 
     const course = await Course.findById(courseId);
     if (!course || !course.isActive)
       return res.status(404).json({ success: false, message: 'Course not found' });
 
-    // Check already verified registration for same email+course
-    const alreadyDone = await Registration.findOne({ email, course: courseId, isVerified: true, status: { $ne: 'Cancelled' } });
+    // Check already verified
+    const alreadyDone = await Registration.findOne({
+      email, course: courseId, isVerified: true, status: { $ne: 'Cancelled' }
+    });
     if (alreadyDone)
       return res.status(409).json({ success: false, message: 'You are already registered for this course' });
 
     const otp        = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
-    // Upsert unverified record (resend OTP support)
     const reg = await Registration.findOneAndUpdate(
       { email, course: courseId, isVerified: false },
       { name, phone, otp, otpExpires },
@@ -39,11 +38,15 @@ export const requestRegistration = async (req, res, next) => {
 
     await sendOTPEmail({ to: email, name, otp, courseName: course.title });
 
-    res.json({ success: true, message: `OTP sent to ${email}. Valid for 10 minutes.`, registrationId: reg._id });
+    res.json({
+      success: true,
+      message: `OTP sent to ${email}. Valid for 10 minutes.`,
+      registrationId: reg._id,
+    });
   } catch (err) { next(err); }
 };
 
-// POST /api/registrations/verify-otp  — Step 2: verify and complete
+// POST /api/registrations/verify-otp  — Step 2
 export const verifyOTP = async (req, res, next) => {
   try {
     const { registrationId, otp } = req.body;
@@ -52,7 +55,7 @@ export const verifyOTP = async (req, res, next) => {
 
     const reg = await Registration.findById(registrationId).select('+otp +otpExpires');
     if (!reg)
-      return res.status(404).json({ success: false, message: 'Registration not found' });
+      return res.status(404).json({ success: false, message: 'Registration not found. Please start again.' });
     if (reg.isVerified)
       return res.status(400).json({ success: false, message: 'Already verified' });
     if (reg.otp !== otp.trim())
@@ -68,10 +71,16 @@ export const verifyOTP = async (req, res, next) => {
     await Course.findByIdAndUpdate(reg.course, { $inc: { enrolledCount: 1 } });
 
     const course = await Course.findById(reg.course).select('title');
-    await sendRegistrationConfirmation({ to: reg.email, name: reg.name, courseName: course?.title || 'your course' });
+    await sendRegistrationConfirmation({
+      to: reg.email, name: reg.name, courseName: course?.title || 'your course'
+    });
 
     await reg.populate('course', 'title duration price');
-    res.json({ success: true, message: 'Registration confirmed! Check your email for details.', data: reg });
+    res.json({
+      success: true,
+      message: 'Registration confirmed! Check your email for details.',
+      data: reg,
+    });
   } catch (err) { next(err); }
 };
 
@@ -85,8 +94,8 @@ export const resendOTP = async (req, res, next) => {
 
     const otp        = generateOTP();
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
-    reg.otp         = otp;
-    reg.otpExpires  = otpExpires;
+    reg.otp          = otp;
+    reg.otpExpires   = otpExpires;
     await reg.save();
 
     const course = await Course.findById(reg.course).select('title');
@@ -96,10 +105,12 @@ export const resendOTP = async (req, res, next) => {
   } catch (err) { next(err); }
 };
 
-// GET /api/registrations  (admin)
+// GET /api/registrations  (admin) — show ALL verified registrations
 export const getRegistrations = async (req, res, next) => {
   try {
     const { status, course } = req.query;
+
+    // Admin always sees verified registrations only
     const filter = { isVerified: true };
     if (status) filter.status = status;
     if (course) filter.course = course;
@@ -108,6 +119,7 @@ export const getRegistrations = async (req, res, next) => {
       .populate('course', 'title duration price')
       .select('-otp -otpExpires')
       .sort('-createdAt');
+
     res.json({ success: true, count: regs.length, data: regs });
   } catch (err) { next(err); }
 };
@@ -116,11 +128,19 @@ export const getRegistrations = async (req, res, next) => {
 export const updateRegistrationStatus = async (req, res, next) => {
   try {
     const { status, notes } = req.body;
+
+    const validStatuses = ['Pending', 'Confirmed', 'Cancelled'];
+    if (status && !validStatuses.includes(status))
+      return res.status(400).json({ success: false, message: 'Invalid status' });
+
     const reg = await Registration.findByIdAndUpdate(
-      req.params.id, { status, notes }, { new: true, runValidators: true }
+      req.params.id,
+      { ...(status && { status }), ...(notes !== undefined && { notes }) },
+      { new: true, runValidators: true }
     ).populate('course', 'title');
 
-    if (!reg) return res.status(404).json({ success: false, message: 'Registration not found' });
+    if (!reg)
+      return res.status(404).json({ success: false, message: 'Registration not found' });
 
     if (status === 'Cancelled')
       await Course.findByIdAndUpdate(reg.course._id, { $inc: { enrolledCount: -1 } });

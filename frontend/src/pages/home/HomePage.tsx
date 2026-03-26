@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getCourses, getFaculty, getAnnouncements } from '@/api';
-import type { Course, Faculty, Announcement, ApiError } from '@/types';
+import type { Course, Faculty, Announcement } from '@/types';
 import RegisterModal from '@/components/RegisterModal';
 import toast from 'react-hot-toast';
 

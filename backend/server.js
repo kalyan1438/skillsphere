@@ -12,7 +12,7 @@ import registrationRoutes from './src/routes/registrationRoutes.js';
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*', credentials: true }));
+app.use(cors({ origin: process.env.CLIENT__ORIGIN || '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

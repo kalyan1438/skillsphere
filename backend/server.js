@@ -16,7 +16,7 @@ app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*', credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/admin',         adminRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/courses',       courseRoutes);
 app.use('/api/faculty',       facultyRoutes);
 app.use('/api/announcements', announcementRoutes);

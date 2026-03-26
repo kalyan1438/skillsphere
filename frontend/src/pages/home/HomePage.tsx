@@ -113,9 +113,7 @@ const HomePage = () => {
                   { icon: '🏆', title: 'Expert Trainers',    desc: 'Industry professionals with real experience' },
                   { icon: '🛠️', title: 'Live Projects',      desc: 'Build portfolio-ready projects' },
                   { icon: '📋', title: 'Interview Prep',     desc: 'Mock interviews & resume building' },
-                  { icon: '🎓', title: 'Certification',      desc: 'Industry-recognized certificates' },
                   { icon: '📅', title: 'Flexible Batches',   desc: 'Weekday, weekend & fast-track' },
-                  { icon: '🤝', title: 'Placement Help',     desc: '50+ hiring partners across India' },
                 ].map(item => (
                   <div key={item.title} className="bg-slate-50 rounded-xl p-4 hover:bg-blue-50 hover:border-blue-200 border border-transparent transition-all">
                     <div className="text-2xl mb-2">{item.icon}</div>

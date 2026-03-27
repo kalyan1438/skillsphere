@@ -5,8 +5,8 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Generate OTP
 export const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
-  
-const FROM = process.env.RESEND_FROM || "kalyan143811@gmail.com";
+
+const FROM = "onboarding@resend.dev";
 
 
 // ================= OTP EMAIL =================

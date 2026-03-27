@@ -8,7 +8,7 @@ import courseRoutes       from './src/routes/courseRoutes.js';
 import facultyRoutes      from './src/routes/facultyRoutes.js';
 import announcementRoutes from './src/routes/announcementRoutes.js';
 import registrationRoutes from './src/routes/registrationRoutes.js';
-import {transporter} from "./src/config/email.js"
+
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
@@ -23,20 +23,6 @@ app.use('/api/announcements', announcementRoutes);
 app.use('/api/registrations', registrationRoutes);
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok', message: 'SkillSphere API running 🚀' }));
-app.get('/test-email', async (req, res) => {
-  try {
-    await transporter.sendMail({
-      from: process.env.SMTP_USER,
-      to: "your_email@gmail.com",
-      subject: "Test",
-      text: "Working",
-    });
-    res.send("Email sent");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
-  }
-});
 app.use(notFound);
 app.use(errorHandler);
 

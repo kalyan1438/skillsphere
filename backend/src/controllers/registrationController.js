@@ -28,6 +28,7 @@ export const requestRegistration = async (req, res, next) => {
       return res.status(409).json({ success: false, message: 'You are already registered for this course' });
 
     const otp        = generateOTP();
+    console.log(otp)
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
 
     const reg = await Registration.findOneAndUpdate(

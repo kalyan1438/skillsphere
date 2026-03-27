@@ -1,0 +1,86 @@
+import nodemailer from 'nodemailer';
+
+// Generate 6-digit OTP
+export const generateOTP = () =>
+  Math.floor(100000 + Math.random() * 900000).toString();
+
+// Smart transporter — tries multiple configs
+const createTransporter = () => {
+  // If using Resend (recommended for Render)
+  if (process.env.RESEND_API_KEY) {
+    return nodemailer.createTransport({
+      host: 'smtp.resend.com',
+      port: 465,
+      secure: true,
+      auth: {
+        user: 'resend',
+        pass: process.env.RESEND_API_KEY,
+      },
+    });
+  }
+
+  // Gmail via OAuth2 / App Password
+  return nodemailer.createTransport({
+    service: 'gmail',  // use 'service' instead of host/port — nodemailer handles it
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+    tls: { rejectUnauthorized: false },
+  });
+};
+
+const FROM = `"SkillSphere Academy" <${process.env.SMTP_USER || process.env.RESEND_FROM || 'noreply@skillsphere.in'}>`;
+
+export const sendOTPEmail = async ({ to, name, otp, courseName }) => {
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: FROM, to,
+    subject: 'Your OTP for Course Registration — SkillSphere Academy',
+    
+  });
+};
+
+export const sendRegistrationConfirmation = async ({ to, name, courseName }) => {
+  const transporter = createTransporter();
+  await transporter.sendMail({
+    from: FROM, to,
+    subject: `Registration Confirmed — ${courseName} | SkillSphere Academy`,
+    html: `
+    <div style="font-family:sans-serif;max-width:540px;margin:auto;padding:32px;border:1px solid #e2e8f0;border-radius:14px;">
+      <span style="font-weight:800;font-size:18px;color:#0f172a;">SKILL<span style="color:#1A6BCC;">SPHERE</span></span>
+      <p style="color:#0f172a;margin-top:20px;">Hi <strong>${name}</strong>,</p>
+      <p style="color:#334155;">Your registration for <strong>${courseName}</strong> is confirmed! 🎉</p>
+      <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;padding:16px;margin:20px 0;">
+        <p style="color:#16a34a;font-weight:600;margin:0;">✅ Registration Successful</p>
+        <p style="color:#15803d;font-size:13px;margin:4px 0 0;">Our team will contact you within 24 hours.</p>
+      </div>
+      <p style="color:#64748b;font-size:13px;">For queries: <strong>+91-9849460990</strong></p>
+      <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;"/>
+      <p style="color:#94a3b8;font-size:12px;">SkillSphere Soft Solutions Pvt Ltd, Vadlamudi, Guntur, AP</p>
+    </div>`,
+  });
+};
+
+export const sendAnnouncementBlast = async ({ recipients, title, description }) => {
+  const transporter = createTransporter();
+  const BATCH = 50;
+  let sent = 0;
+  for (let i = 0; i < recipients.length; i += BATCH) {
+    const bcc = recipients.slice(i, i + BATCH).join(',');
+    await transporter.sendMail({
+      from: FROM, bcc,
+      subject: `[SkillSphere] ${title}`,
+      html: `
+      <div style="font-family:sans-serif;max-width:540px;margin:auto;padding:32px;border:1px solid #e2e8f0;border-radius:14px;">
+        <span style="font-weight:800;font-size:18px;color:#0f172a;">SKILL<span style="color:#1A6BCC;">SPHERE</span></span>
+        <h2 style="color:#0f172a;margin-top:20px;">${title}</h2>
+        <div style="color:#334155;line-height:1.7;">${description.replace(/\n/g,'<br/>')}</div>
+        <hr style="border:none;border-top:1px solid #e2e8f0;margin:24px 0;"/>
+        <p style="color:#94a3b8;font-size:12px;">SkillSphere Soft Solutions Pvt Ltd, Vadlamudi, Guntur, AP</p>
+      </div>`,
+    });
+    sent += bcc.split(',').filter(Boolean).length;
+  }
+  return sent;
+};

@@ -8,7 +8,7 @@ import courseRoutes       from './src/routes/courseRoutes.js';
 import facultyRoutes      from './src/routes/facultyRoutes.js';
 import announcementRoutes from './src/routes/announcementRoutes.js';
 import registrationRoutes from './src/routes/registrationRoutes.js';
-
+import {transporter} from "./src/config/email.js"
 const app  = express();
 const PORT = process.env.PORT || 5000;
 

@@ -104,3 +104,4 @@ npm run dev       # Runs on http://localhost:5173
 ## Tech Stack
 - **Frontend:** React 18, TypeScript, Tailwind CSS, Vite, Axios, React Router v6, React Hot Toast
 - **Backend:** Node.js, Express.js, MongoDB (Mongoose), JWT, Nodemailer, bcryptjs
+"# skillsphere" 

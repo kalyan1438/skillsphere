@@ -6,7 +6,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export const generateOTP = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
 
-const FROM = "onboarding@resend.dev";
+const FROM = "Skillsphere<noreply@skill-sphere.in>";
 
 
 // ================= OTP EMAIL =================

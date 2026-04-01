@@ -55,7 +55,7 @@ const HomePage = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-20">
           <div className="max-w-2xl">
             <div className="inline-block bg-primary/20 border border-primary/40 text-blue-300 text-xs font-bold px-4 py-1.5 rounded-full mb-6 backdrop-blur-sm tracking-widest uppercase">
-              SkillSphere Academy
+              SkillSphere Soft Solutions
             </div>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight tracking-tight mb-6">
               Build your skills<br/>today. <span className="text-blue-400">It's affordable.</span>

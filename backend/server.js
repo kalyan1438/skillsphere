@@ -12,7 +12,13 @@ import registrationRoutes from './src/routes/registrationRoutes.js';
 const app  = express();
 const PORT = process.env.PORT || 5000;
 
-app.use(cors({ origin: process.env.CLIENT_ORIGIN || '*', credentials: true }));
+app.use(cors({
+  origin: [
+    "https://skill-sphere.in",
+    "https://www.skill-sphere.in"
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
